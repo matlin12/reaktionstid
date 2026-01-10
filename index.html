@@ -196,17 +196,45 @@ function beginRunning() {
   loop();
 }
 
-  function stopGame() {
-    running = false;
-    target.style.display = "none";
+function stopGame() {
+  running = false;
+  target.style.display = "none";
 
-    const avg = reactionCount ? (reactionSum / reactionCount) : 0;
-    results.hidden = false;
-    results.innerHTML =
-      `<h2>Resultat</h2>
-       <p><strong>Total score:</strong> ${score}</p>
-       <p><strong>Genomsnittlig reaktionstid:</strong> ${avg.toFixed(0)} ms</p>
-       <button id="again">Spela igen</button>`;
+  const avg = reactionCount ? (reactionSum / reactionCount) : 0;
+  results.hidden = false;
+  results.innerHTML =
+    `<h2>Resultat</h2>
+     <p><strong>Total score:</strong> ${score}</p>
+     <p><strong>Genomsnittlig reaktionstid:</strong> ${avg.toFixed(0)} ms</p>
+     <button id="again">Spela igen</button>`;
+
+  document.getElementById("again").addEventListener("click", resetToStart);
+}
+
+function resetToStart() {
+  running = false;
+
+  // rensa siffror
+  score = 0;
+  reactionSum = 0;
+  reactionCount = 0;
+
+  scoreEl.textContent = "0";
+  avgEl.textContent = "-";
+  timeLeftEl.textContent = "0.0";
+
+  // UI tillbaka som start
+  results.hidden = true;
+  results.textContent = "";
+
+  countdownEl.hidden = true;
+
+  playArea.hidden = true;
+  hud.hidden = true;
+  menu.hidden = false;
+
+  target.style.display = "none";
+}
 
   document.getElementById("again").addEventListener("click", resetToStart);
 
@@ -289,4 +317,5 @@ function beginRunning() {
 
 </body>
 </html>
+
 
