@@ -13,7 +13,11 @@
       --accent: #ffd54a;
       --border: rgba(255,255,255,0.18);
       --shadow: rgba(0,0,0,0.35);
+      --w: 420px;
     }
+
+    /* VIKTIGT: gör så att hidden ALLTID gömmer, även om vi råkar sätta display på id:n */
+    [hidden] { display: none !important; }
 
     body{
       font-family: system-ui, Arial, sans-serif;
@@ -24,25 +28,30 @@
       min-height: 100vh;
     }
 
-  h1 {
-    text-align: center;
-    margin: 0 auto 14px;
-    letter-spacing: 1px;
-    font-weight: 900;
+    /* En gemensam "kolumn" så allt blir centrerat + lika brett */
+    .wrap{
+      width: min(100%, var(--w));
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
 
-    /* Golden glow */
-    color: #ffe08a;
-    text-shadow:
-      0 0 4px  rgba(255, 210, 90, 0.9),
-      0 0 10px rgba(255, 200, 60, 0.7),
-      0 0 22px rgba(255, 180, 40, 0.55),
-      0 0 40px rgba(255, 160, 20, 0.35);
-  }
+    h1{
+      text-align: center;
+      margin: 0;
+      letter-spacing: 1px;
+      font-weight: 900;
 
+      /* Golden glow */
+      color: #ffe08a;
+      text-shadow:
+        0 0 4px  rgba(255, 210, 90, 0.95),
+        0 0 10px rgba(255, 200, 60, 0.80),
+        0 0 22px rgba(255, 180, 40, 0.55),
+        0 0 40px rgba(255, 160, 20, 0.35);
     }
 
     .panel{
-      max-width: 420px;
       padding: 12px;
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -51,37 +60,28 @@
       backdrop-filter: blur(8px);
     }
 
-    #menu p{
-      margin: 0 0 10px;
-      color: var(--muted);
-    }
-
-    #menu {
-      text-align: center;
-    }
+    #menu{ text-align: center; }
+    #menu p{ margin: 0 0 10px; color: var(--muted); }
 
     #menu button{
       font-size: 18px;
       min-width: 90px;
       padding: 10px 14px;
-      margin-right: 8px;
-      margin-bottom: 8px;
+      margin: 0 6px 8px;
       border-radius: 12px;
       border: 1px solid var(--border);
       background: rgba(255,255,255,0.06);
       color: var(--text);
       cursor: pointer;
     }
-
     #menu button:active{ transform: scale(0.98); }
 
     #hud{
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
-      margin: 12px 0;
       font-size: 15px;
-      max-width: 420px;
+      justify-content: center;
     }
 
     .pill{
@@ -90,33 +90,25 @@
       border: 1px solid var(--border);
       background: rgba(255,255,255,0.06);
       box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+      white-space: nowrap;
     }
 
     #countdown{
-      max-width: 420px;
-      margin: 10px 0 12px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.06);
       text-align: center;
       font-weight: 900;
       font-size: 48px;
       letter-spacing: 1px;
-      box-shadow: 0 12px 28px var(--shadow);
     }
 
     #playArea{
       position: relative;
       width: 100%;
-      max-width: 400px;
       height: 40vh;
       min-height: 220px;
-      margin: 0 auto;          /* centrerad */
       border: 2px solid rgba(255,255,255,0.2);
       border-radius: 16px;
       overflow: hidden;
-      touch-action: none;      /* viktigt för mobil */
+      touch-action: none;
       user-select: none;
       background:
         radial-gradient(circle at 20% 10%, rgba(255,213,74,0.18), transparent 45%),
@@ -126,7 +118,6 @@
       box-shadow: 0 18px 40px rgba(0,0,0,0.35);
     }
 
-    /* Målet */
     #target{
       position: absolute;
       width: 56px;
@@ -142,28 +133,16 @@
       box-shadow: 0 12px 18px rgba(0,0,0,0.35);
       transition: transform 80ms ease;
     }
-
     #target:active{ transform: scale(0.92); }
 
-    /* “Pop”-känsla när den flyttar */
     .pop{ animation: pop 120ms ease; }
     @keyframes pop{
       from { transform: scale(0.85); }
       to   { transform: scale(1.0); }
     }
 
-    #results{
-      margin-top: 14px;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      max-width: 420px;
-      background: rgba(255,255,255,0.06);
-      box-shadow: 0 12px 28px var(--shadow);
-    }
-
     #results h2{ margin: 0 0 8px; }
-    #results p{ margin: 6px 0; color: var(--text); }
+    #results p{ margin: 6px 0; }
     #results .muted{ color: var(--muted); }
 
     #again{
@@ -177,51 +156,37 @@
       cursor: pointer;
     }
     #again:active{ transform: scale(0.98); }
-
-    #menu, #hud, #results, #countdown {
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    #results {
-      display: block;
-      text-align: left;
-      margin: 14px auto;
-      color: #f3f4f6;
-    }
-
   </style>
 </head>
 
 <body>
-  <h1>Tryck på målet</h1>
+  <div class="wrap">
+    <h1>Tryck på målet</h1>
 
-  <div id="menu" class="panel">
-    <p>Välj speltid:</p>
-    <button class="timeBtn" data-seconds="5">5 sek</button>
-    <button class="timeBtn" data-seconds="10">10 sek</button>
-    <button class="timeBtn" data-seconds="20">20 sek</button>
+    <div id="menu" class="panel">
+      <p>Välj speltid:</p>
+      <button class="timeBtn" data-seconds="5">5 sek</button>
+      <button class="timeBtn" data-seconds="10">10 sek</button>
+      <button class="timeBtn" data-seconds="20">20 sek</button>
+    </div>
+
+    <div id="hud" class="panel" hidden>
+      <div class="pill">Tid kvar: <span id="timeLeft">0.0</span>s</div>
+      <div class="pill">Score: <span id="score">0</span></div>
+      <div class="pill">Snitt: <span id="avg">-</span> ms</div>
+      <div class="pill">Nivå: <span id="level">1</span></div>
+    </div>
+
+    <div id="countdown" class="panel" hidden>3</div>
+
+    <div id="playArea" hidden>
+      <div id="target" aria-label="mål" role="button">★</div>
+    </div>
+
+    <div id="results" class="panel" hidden></div>
   </div>
-
-  <div id="hud" hidden>
-    <div class="pill">Tid kvar: <span id="timeLeft">0.0</span>s</div>
-    <div class="pill">Score: <span id="score">0</span></div>
-    <div class="pill">Snitt: <span id="avg">-</span> ms</div>
-    <div class="pill">Nivå: <span id="level">1</span></div>
-  </div>
-
-  <div id="countdown" hidden>3</div>
-
-  <div id="playArea" hidden>
-    <div id="target" aria-label="mål" role="button">★</div>
-  </div>
-
-  <div id="results" hidden></div>
 
   <script>
-    // -----------------------------
-    // Element
-    // -----------------------------
     const menu = document.getElementById("menu");
     const hud = document.getElementById("hud");
     const playArea = document.getElementById("playArea");
@@ -234,9 +199,6 @@
     const avgEl = document.getElementById("avg");
     const levelEl = document.getElementById("level");
 
-    // -----------------------------
-    // Lagring (rekord + historik)
-    // -----------------------------
     const STORAGE_KEY = "tap_target_stats_v1";
 
     function loadStats() {
@@ -260,9 +222,6 @@
 
     let stats = loadStats();
 
-    // -----------------------------
-    // Spel-state
-    // -----------------------------
     let durationMs = 0;
     let endTime = 0;
     let running = false;
@@ -272,9 +231,6 @@
     let reactionCount = 0;
     let targetShownAt = 0;
 
-    // -----------------------------
-    // Startknappar
-    // -----------------------------
     document.querySelectorAll(".timeBtn").forEach(btn => {
       btn.addEventListener("click", () => {
         const seconds = Number(btn.dataset.seconds);
@@ -282,7 +238,6 @@
       });
     });
 
-    // Klick/tryck på målet (pointerdown funkar bra på iPhone)
     target.addEventListener("pointerdown", (e) => {
       if (!running) return;
       e.preventDefault();
@@ -298,11 +253,7 @@
       placeTargetRandom();
     });
 
-    // -----------------------------
-    // Nivåer + skins
-    // -----------------------------
     function getLevelFromScore(s) {
-      // Du kan tweaka dessa gränser:
       if (s >= 40) return 5;
       if (s >= 28) return 4;
       if (s >= 18) return 3;
@@ -311,32 +262,25 @@
     }
 
     function applyLevelStyle(level) {
-      // Målet blir mindre med högre nivå
       const size = Math.max(28, 56 - (level - 1) * 6);
       target.style.width = size + "px";
       target.style.height = size + "px";
       target.style.fontSize = Math.max(16, Math.round(size * 0.5)) + "px";
 
-      // Byt “skin” (symbol)
       const skins = ["★", "✦", "✶", "✹", "✸"];
       target.textContent = skins[level - 1] || "★";
     }
 
     function medalForScore(s) {
-      // Medalj baserat på score (du kan justera!)
-      if (s >= 7) return { name: "Guld 🥇", note: "Du är snabb!" };
-      if (s >= 6) return { name: "Silver 🥈", note: "Stabilt!" };
-      if (s >= 4) return { name: "Brons 🥉", note: "Bra start!" };
+      if (s >= 35) return { name: "Guld 🥇", note: "Du är snabb!" };
+      if (s >= 25) return { name: "Silver 🥈", note: "Stabilt!" };
+      if (s >= 15) return { name: "Brons 🥉", note: "Bra start!" };
       return { name: "Ingen medalj ännu", note: "Fortsätt träna!" };
     }
 
-    // -----------------------------
-    // Start / nedräkning
-    // -----------------------------
     function startGame(seconds) {
       durationMs = seconds * 1000;
 
-      // reset
       score = 0;
       reactionSum = 0;
       reactionCount = 0;
@@ -347,7 +291,6 @@
       levelEl.textContent = "1";
       timeLeftEl.textContent = seconds.toFixed(1);
 
-      // UI
       results.hidden = true;
       results.textContent = "";
 
@@ -391,9 +334,6 @@
       loop();
     }
 
-    // -----------------------------
-    // Loop / HUD
-    // -----------------------------
     function loop() {
       if (!running) return;
 
@@ -423,21 +363,15 @@
       applyLevelStyle(lvl);
     }
 
-    // -----------------------------
-    // Placera mål slumpmässigt
-    // -----------------------------
     function placeTargetRandom() {
-      // visa ifall den var dold
       target.style.display = "grid";
 
-      // “pop” animation
       target.classList.remove("pop");
       void target.offsetWidth;
       target.classList.add("pop");
 
       const areaRect = playArea.getBoundingClientRect();
 
-      // Läs faktisk storlek (för att nivåer ändrar storlek)
       const size = target.getBoundingClientRect().width;
       const margin = 6;
 
@@ -457,39 +391,27 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // -----------------------------
-    // Jämförelse idag (lokalt)
-    // -----------------------------
     function todaysAttempts() {
       const key = todayKey();
       return stats.attempts.filter(a => a.day === key && typeof a.score === "number");
     }
 
-  function topPercentHigherIsBetter(value, values) {
-    // Returnerar ett tal 1..100 där LÄGRE är bättre (t.ex. 20 = topp 20%)
-    // “Bland de topp X%” betyder: andelen som är >= din score.
-    if (values.length === 0) return null;
-
-    let countAtLeast = 0;
-    for (const v of values) {
-      if (v >= value) countAtLeast++;
-  }
-
-  const top = (countAtLeast / values.length) * 100;
-  return Math.max(1, Math.round(top));
-}
+    function topPercentHigherIsBetter(value, values) {
+      // "Bland de X% bästa" = andelen rundor idag som är >= din score
+      if (values.length === 0) return null;
+      let countAtLeast = 0;
+      for (const v of values) if (v >= value) countAtLeast++;
+      const top = (countAtLeast / values.length) * 100;
+      return Math.max(1, Math.round(top));
+    }
 
     function overallAvgMsFromAttempts() {
-      // snitt av "avgMs" från varje runda som har avgMs
       const list = stats.attempts.filter(a => typeof a.avgMs === "number");
       if (list.length === 0) return null;
       const sum = list.reduce((acc, a) => acc + a.avgMs, 0);
       return sum / list.length;
     }
 
-    // -----------------------------
-    // Stop / resultat / spara
-    // -----------------------------
     function stopGame() {
       running = false;
       target.style.display = "none";
@@ -497,13 +419,11 @@
       const avg = reactionCount ? (reactionSum / reactionCount) : 0;
       const avgMs = reactionCount ? (reactionSum / reactionCount) : null;
 
-      // Uppdatera rekord
       if (score > stats.bestScore) stats.bestScore = score;
       if (avgMs !== null) {
         if (stats.bestAvgMs === null || avgMs < stats.bestAvgMs) stats.bestAvgMs = avgMs;
       }
 
-      // Spara försök
       stats.attempts.push({
         day: todayKey(),
         score: score,
@@ -511,27 +431,23 @@
         t: Date.now()
       });
 
-      // håll listan liten
       if (stats.attempts.length > 200) stats.attempts = stats.attempts.slice(-200);
-
       saveStats(stats);
 
-      // Jämförelse idag (baserat på dina rundor idag på samma enhet)
       const todays = todaysAttempts();
       const scoresToday = todays.map(a => a.score);
-      const p = percentileRankHigherIsBetter(score, scoresToday);
+      const topPct = topPercentHigherIsBetter(score, scoresToday);
 
       let compareText = "";
-      if (p !== null) {
-        const topPct = Math.max(1, Math.round(100 - p));
-        compareText = `<p><strong>Jämförelse idag:</strong> Du är bland de <strong>${topPct}%</strong> bästa (på den här enheten idag).</p>`;
+      if (topPct !== null) {
+        compareText =
+          `<p><strong>Jämförelse idag:</strong> Du är bland de <strong>${topPct}%</strong> bästa (på den här enheten idag).</p>
+           <p class="muted">(${scoresToday.length} rundor idag)</p>`;
       }
 
-      // Personligt snitt (över alla rundor på enheten)
       const overallAvg = overallAvgMsFromAttempts();
       const overallText = (overallAvg === null) ? "-" : `${overallAvg.toFixed(0)} ms`;
 
-      // Medalj
       const medal = medalForScore(score);
       const medalText = `<p><strong>Medalj:</strong> ${medal.name} — <span class="muted">${medal.note}</span></p>`;
 
@@ -556,7 +472,6 @@
     function resetToStart() {
       running = false;
 
-      // reset siffror
       score = 0;
       reactionSum = 0;
       reactionCount = 0;
@@ -566,7 +481,6 @@
       timeLeftEl.textContent = "0.0";
       levelEl.textContent = "1";
 
-      // UI som första gången
       results.hidden = true;
       results.textContent = "";
       countdownEl.hidden = true;
@@ -581,9 +495,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
