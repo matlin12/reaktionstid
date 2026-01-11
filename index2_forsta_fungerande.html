@@ -1,1 +1,326 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tryck på målet</title>
+<style>
+  body {
+    font-family: system-ui, Arial, sans-serif;
+    margin: 16px;
+    line-height: 1.3;
+  }
+
+  h1 { margin: 0 0 12px; }
+
+  #menu button {
+    font-size: 18px;
+    padding: 10px 14px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+
+  #hud {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+    font-size: 16px;
+  }
+
+  #playArea {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 40vh;
+    min-height: 220px;
+    border: 2px solid #333;
+    border-radius: 12px;
+    overflow: hidden;
+    /* Viktigt för mobil: gör att tryck inte scrollar/zoomar */
+    touch-action: none;
+    user-select: none;
+  }
+
+  /* Själva målet */
+  #target {
+    position: absolute;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 3px solid #111;
+    background: #ffd54a;
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Liten “symbol” i målet */
+  #target::before { content: "★"; }
+
+  #results {
+    margin-top: 14px;
+    padding: 12px;
+    border: 2px dashed #333;
+    border-radius: 12px;
+    max-width: 376px;
+  }
+</style>
+</head>
+<body>
+  <h1>Tryck på målet</h1>
+
+  <div id="menu">
+    <p>Välj speltid:</p>
+    <button class="timeBtn" data-seconds="5">5 sek</button>
+    <button class="timeBtn" data-seconds="10">10 sek</button>
+    <button class="timeBtn" data-seconds="20">20 sek</button>
+  </div>
+
+  <div id="hud" hidden>
+    <div>Tid kvar: <span id="timeLeft">0.0</span>s</div>
+    <div>Score: <span id="score">0</span></div>
+    <div>Snittreaktion: <span id="avg">-</span> ms</div>
+  </div>
+
+  <div id="countdown" hidden style="font-size: 48px; font-weight: 800; margin: 12px 0;">
+  3
+  </div>
+
+  <div id="playArea" hidden>
+    <div id="target" aria-label="mål" role="button"></div>
+  </div>
+
+  <div id="results" hidden></div>
+
+<script>
+  const menu = document.getElementById("menu");
+  const hud = document.getElementById("hud");
+  const playArea = document.getElementById("playArea");
+  const target = document.getElementById("target");
+  const results = document.getElementById("results");
+  const countdownEl = document.getElementById("countdown");
+
+  const timeLeftEl = document.getElementById("timeLeft");
+  const scoreEl = document.getElementById("score");
+  const avgEl = document.getElementById("avg");
+
+  let durationMs = 0;
+  let endTime = 0;
+  let running = false;
+
+  let score = 0;
+  let reactionSum = 0;
+  let reactionCount = 0;
+  let targetShownAt = 0;
+
+  // Starta spel när man väljer 5/10/20
+  document.querySelectorAll(".timeBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const seconds = Number(btn.dataset.seconds);
+      startGame(seconds);
+    });
+  });
+
+  // Klick/tryck på målet (pointerdown funkar bra på iPhone också)
+  target.addEventListener("pointerdown", (e) => {
+    if (!running) return;
+    e.preventDefault();
+
+    const now = performance.now();
+    const reaction = now - targetShownAt;
+
+    score++;
+    reactionSum += reaction;
+    reactionCount++;
+
+    updateHud();
+    placeTargetRandom();
+  });
+
+function startGame(seconds) {
+  durationMs = seconds * 1000;
+
+  // reset allt
+  score = 0;
+  reactionSum = 0;
+  reactionCount = 0;
+  running = false;
+
+  scoreEl.textContent = "0";
+  avgEl.textContent = "-";
+  timeLeftEl.textContent = seconds.toFixed(1);
+
+  // UI: göm resultat, göm mål, visa nedräkning
+  results.hidden = true;
+  results.textContent = "";
+
+  menu.hidden = true;
+  hud.hidden = false;
+  playArea.hidden = false;
+
+  target.style.display = "none";
+  countdownEl.hidden = false;
+
+  startCountdownThenRun(3);
+}
+
+function startCountdownThenRun(fromNumber) {
+  let n = fromNumber;
+  countdownEl.textContent = n;
+
+  const tick = () => {
+    n--;
+    if (n <= 0) {
+      countdownEl.textContent = "GO!";
+      setTimeout(() => {
+        countdownEl.hidden = true;
+        beginRunning();
+      }, 250);
+      return;
+    }
+
+    countdownEl.textContent = n;
+    setTimeout(tick, 700);
+  };
+
+  setTimeout(tick, 700);
+}
+
+function beginRunning() {
+  endTime = performance.now() + durationMs;
+  running = true;
+  placeTargetRandom();
+  loop();
+}
+
+function stopGame() {
+  running = false;
+  target.style.display = "none";
+
+  const avg = reactionCount ? (reactionSum / reactionCount) : 0;
+  results.hidden = false;
+  results.innerHTML =
+    `<h2>Resultat</h2>
+     <p><strong>Total score:</strong> ${score}</p>
+     <p><strong>Genomsnittlig reaktionstid:</strong> ${avg.toFixed(0)} ms</p>
+     <button id="again">Spela igen</button>`;
+
+  document.getElementById("again").addEventListener("click", resetToStart);
+}
+
+function resetToStart() {
+  running = false;
+
+  // rensa siffror
+  score = 0;
+  reactionSum = 0;
+  reactionCount = 0;
+
+  scoreEl.textContent = "0";
+  avgEl.textContent = "-";
+  timeLeftEl.textContent = "0.0";
+
+  // UI tillbaka som start
+  results.hidden = true;
+  results.textContent = "";
+
+  countdownEl.hidden = true;
+
+  playArea.hidden = true;
+  hud.hidden = true;
+  menu.hidden = false;
+
+  target.style.display = "none";
+}
+
+  document.getElementById("again").addEventListener("click", resetToStart);
+
+  function resetToStart() {
+  running = false;
+
+  // rensa siffror
+  score = 0;
+  reactionSum = 0;
+  reactionCount = 0;
+
+  scoreEl.textContent = "0";
+  avgEl.textContent = "-";
+  timeLeftEl.textContent = "0.0";
+
+  // UI tillbaka som start
+  results.hidden = true;
+  results.textContent = "";
+
+  countdownEl.hidden = true;
+
+  playArea.hidden = true;
+  hud.hidden = true;
+  menu.hidden = false;
+
+  target.style.display = "none";
+}
+
+  function loop() {
+    if (!running) return;
+
+    const now = performance.now();
+    const leftMs = Math.max(0, endTime - now);
+    timeLeftEl.textContent = (leftMs / 1000).toFixed(1);
+
+    if (leftMs <= 0) {
+      stopGame();
+      return;
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  function updateHud() {
+    scoreEl.textContent = score;
+    if (reactionCount === 0) {
+      avgEl.textContent = "-";
+    } else {
+      const avg = reactionSum / reactionCount;
+      avgEl.textContent = avg.toFixed(0);
+    }
+  }
+
+  function placeTargetRandom() {
+    // visa ifall den var dold efter stop
+    target.style.display = "grid";
+
+    const areaRect = playArea.getBoundingClientRect();
+    const size = 56; // samma som CSS width/height
+
+    // lite marginal så den inte klipps av kanterna
+    const margin = 6;
+
+    const maxX = Math.max(margin, areaRect.width - size - margin);
+    const maxY = Math.max(margin, areaRect.height - size - margin);
+
+    const x = rand(margin, maxX);
+    const y = rand(margin, maxY);
+
+    target.style.left = `${x}px`;
+    target.style.top = `${y}px`;
+
+    targetShownAt = performance.now();
+  }
+
+  function rand(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
 
