@@ -4,75 +4,170 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tryck på målet</title>
-<style>
-  body {
-    font-family: system-ui, Arial, sans-serif;
-    margin: 16px;
-    line-height: 1.3;
-  }
 
-  h1 { margin: 0 0 12px; }
+  <style>
+    :root{
+      --panel: rgba(255,255,255,0.08);
+      --text: #f3f4f6;
+      --muted: rgba(243,244,246,0.75);
+      --accent: #ffd54a;
+      --border: rgba(255,255,255,0.18);
+      --shadow: rgba(0,0,0,0.35);
+    }
 
-  #menu button {
-    font-size: 18px;
-    padding: 10px 14px;
-    margin-right: 8px;
-    margin-bottom: 8px;
-  }
+    body{
+      font-family: system-ui, Arial, sans-serif;
+      margin: 16px;
+      line-height: 1.3;
+      color: var(--text);
+      background: radial-gradient(circle at top, #1b1b2a, #0b0b12);
+      min-height: 100vh;
+    }
 
-  #hud {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    margin: 12px 0;
-    font-size: 16px;
-  }
+    h1{
+      margin: 0 0 12px;
+      font-size: 28px;
+      letter-spacing: 0.2px;
+    }
 
-  #playArea {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    height: 40vh;
-    min-height: 220px;
-    border: 2px solid #333;
-    border-radius: 12px;
-    overflow: hidden;
-    /* Viktigt för mobil: gör att tryck inte scrollar/zoomar */
-    touch-action: none;
-    user-select: none;
-  }
+    .panel{
+      max-width: 420px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+      box-shadow: 0 12px 28px var(--shadow);
+      backdrop-filter: blur(8px);
+    }
 
-  /* Själva målet */
-  #target {
-    position: absolute;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    border: 3px solid #111;
-    background: #ffd54a;
-    display: grid;
-    place-items: center;
-    font-size: 28px;
-    font-weight: 700;
-    cursor: pointer;
-  }
+    #menu p{
+      margin: 0 0 10px;
+      color: var(--muted);
+    }
 
-  /* Liten “symbol” i målet */
-  #target::before { content: "★"; }
+    #menu button{
+      font-size: 18px;
+      padding: 10px 14px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor: pointer;
+    }
 
-  #results {
-    margin-top: 14px;
-    padding: 12px;
-    border: 2px dashed #333;
-    border-radius: 12px;
-    max-width: 376px;
-  }
-</style>
+    #menu button:active{ transform: scale(0.98); }
+
+    #hud{
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+      font-size: 15px;
+      max-width: 420px;
+    }
+
+    .pill{
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+    }
+
+    #countdown{
+      max-width: 420px;
+      margin: 10px 0 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      text-align: center;
+      font-weight: 900;
+      font-size: 48px;
+      letter-spacing: 1px;
+      box-shadow: 0 12px 28px var(--shadow);
+    }
+
+    #playArea{
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      height: 40vh;
+      min-height: 220px;
+      margin: 0 auto;          /* centrerad */
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 16px;
+      overflow: hidden;
+      touch-action: none;      /* viktigt för mobil */
+      user-select: none;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,213,74,0.18), transparent 45%),
+        radial-gradient(circle at 80% 20%, rgba(120,200,255,0.10), transparent 45%),
+        radial-gradient(circle at 50% 100%, rgba(255,80,160,0.08), transparent 55%),
+        rgba(255,255,255,0.03);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+    }
+
+    /* Målet */
+    #target{
+      position: absolute;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 3px solid rgba(0,0,0,0.7);
+      background: var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 12px 18px rgba(0,0,0,0.35);
+      transition: transform 80ms ease;
+    }
+
+    #target:active{ transform: scale(0.92); }
+
+    /* “Pop”-känsla när den flyttar */
+    .pop{ animation: pop 120ms ease; }
+    @keyframes pop{
+      from { transform: scale(0.85); }
+      to   { transform: scale(1.0); }
+    }
+
+    #results{
+      margin-top: 14px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      max-width: 420px;
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 12px 28px var(--shadow);
+    }
+
+    #results h2{ margin: 0 0 8px; }
+    #results p{ margin: 6px 0; color: var(--text); }
+    #results .muted{ color: var(--muted); }
+
+    #again{
+      margin-top: 10px;
+      font-size: 16px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      cursor: pointer;
+    }
+    #again:active{ transform: scale(0.98); }
+  </style>
 </head>
+
 <body>
   <h1>Tryck på målet</h1>
 
-  <div id="menu">
+  <div id="menu" class="panel">
     <p>Välj speltid:</p>
     <button class="timeBtn" data-seconds="5">5 sek</button>
     <button class="timeBtn" data-seconds="10">10 sek</button>
@@ -80,245 +175,375 @@
   </div>
 
   <div id="hud" hidden>
-    <div>Tid kvar: <span id="timeLeft">0.0</span>s</div>
-    <div>Score: <span id="score">0</span></div>
-    <div>Snittreaktion: <span id="avg">-</span> ms</div>
+    <div class="pill">Tid kvar: <span id="timeLeft">0.0</span>s</div>
+    <div class="pill">Score: <span id="score">0</span></div>
+    <div class="pill">Snitt: <span id="avg">-</span> ms</div>
+    <div class="pill">Nivå: <span id="level">1</span></div>
   </div>
 
-  <div id="countdown" hidden style="font-size: 48px; font-weight: 800; margin: 12px 0;">
-  3
-  </div>
+  <div id="countdown" hidden>3</div>
 
   <div id="playArea" hidden>
-    <div id="target" aria-label="mål" role="button"></div>
+    <div id="target" aria-label="mål" role="button">★</div>
   </div>
 
   <div id="results" hidden></div>
 
-<script>
-  const menu = document.getElementById("menu");
-  const hud = document.getElementById("hud");
-  const playArea = document.getElementById("playArea");
-  const target = document.getElementById("target");
-  const results = document.getElementById("results");
-  const countdownEl = document.getElementById("countdown");
+  <script>
+    // -----------------------------
+    // Element
+    // -----------------------------
+    const menu = document.getElementById("menu");
+    const hud = document.getElementById("hud");
+    const playArea = document.getElementById("playArea");
+    const target = document.getElementById("target");
+    const results = document.getElementById("results");
+    const countdownEl = document.getElementById("countdown");
 
-  const timeLeftEl = document.getElementById("timeLeft");
-  const scoreEl = document.getElementById("score");
-  const avgEl = document.getElementById("avg");
+    const timeLeftEl = document.getElementById("timeLeft");
+    const scoreEl = document.getElementById("score");
+    const avgEl = document.getElementById("avg");
+    const levelEl = document.getElementById("level");
 
-  let durationMs = 0;
-  let endTime = 0;
-  let running = false;
+    // -----------------------------
+    // Lagring (rekord + historik)
+    // -----------------------------
+    const STORAGE_KEY = "tap_target_stats_v1";
 
-  let score = 0;
-  let reactionSum = 0;
-  let reactionCount = 0;
-  let targetShownAt = 0;
+    function loadStats() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { bestScore: 0, bestAvgMs: null, attempts: [] };
+      try { return JSON.parse(raw); }
+      catch { return { bestScore: 0, bestAvgMs: null, attempts: [] }; }
+    }
 
-  // Starta spel när man väljer 5/10/20
-  document.querySelectorAll(".timeBtn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const seconds = Number(btn.dataset.seconds);
-      startGame(seconds);
+    function saveStats(s) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    }
+
+    function todayKey() {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    let stats = loadStats();
+
+    // -----------------------------
+    // Spel-state
+    // -----------------------------
+    let durationMs = 0;
+    let endTime = 0;
+    let running = false;
+
+    let score = 0;
+    let reactionSum = 0;
+    let reactionCount = 0;
+    let targetShownAt = 0;
+
+    // -----------------------------
+    // Startknappar
+    // -----------------------------
+    document.querySelectorAll(".timeBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const seconds = Number(btn.dataset.seconds);
+        startGame(seconds);
+      });
     });
-  });
 
-  // Klick/tryck på målet (pointerdown funkar bra på iPhone också)
-  target.addEventListener("pointerdown", (e) => {
-    if (!running) return;
-    e.preventDefault();
+    // Klick/tryck på målet (pointerdown funkar bra på iPhone)
+    target.addEventListener("pointerdown", (e) => {
+      if (!running) return;
+      e.preventDefault();
 
-    const now = performance.now();
-    const reaction = now - targetShownAt;
+      const now = performance.now();
+      const reaction = now - targetShownAt;
 
-    score++;
-    reactionSum += reaction;
-    reactionCount++;
+      score++;
+      reactionSum += reaction;
+      reactionCount++;
 
-    updateHud();
-    placeTargetRandom();
-  });
+      updateHud();
+      placeTargetRandom();
+    });
 
-function startGame(seconds) {
-  durationMs = seconds * 1000;
-
-  // reset allt
-  score = 0;
-  reactionSum = 0;
-  reactionCount = 0;
-  running = false;
-
-  scoreEl.textContent = "0";
-  avgEl.textContent = "-";
-  timeLeftEl.textContent = seconds.toFixed(1);
-
-  // UI: göm resultat, göm mål, visa nedräkning
-  results.hidden = true;
-  results.textContent = "";
-
-  menu.hidden = true;
-  hud.hidden = false;
-  playArea.hidden = false;
-
-  target.style.display = "none";
-  countdownEl.hidden = false;
-
-  startCountdownThenRun(3);
-}
-
-function startCountdownThenRun(fromNumber) {
-  let n = fromNumber;
-  countdownEl.textContent = n;
-
-  const tick = () => {
-    n--;
-    if (n <= 0) {
-      countdownEl.textContent = "GO!";
-      setTimeout(() => {
-        countdownEl.hidden = true;
-        beginRunning();
-      }, 250);
-      return;
+    // -----------------------------
+    // Nivåer + skins
+    // -----------------------------
+    function getLevelFromScore(s) {
+      // Du kan tweaka dessa gränser:
+      if (s >= 40) return 5;
+      if (s >= 28) return 4;
+      if (s >= 18) return 3;
+      if (s >= 10) return 2;
+      return 1;
     }
 
-    countdownEl.textContent = n;
-    setTimeout(tick, 700);
-  };
+    function applyLevelStyle(level) {
+      // Målet blir mindre med högre nivå
+      const size = Math.max(28, 56 - (level - 1) * 6);
+      target.style.width = size + "px";
+      target.style.height = size + "px";
+      target.style.fontSize = Math.max(16, Math.round(size * 0.5)) + "px";
 
-  setTimeout(tick, 700);
-}
-
-function beginRunning() {
-  endTime = performance.now() + durationMs;
-  running = true;
-  placeTargetRandom();
-  loop();
-}
-
-function stopGame() {
-  running = false;
-  target.style.display = "none";
-
-  const avg = reactionCount ? (reactionSum / reactionCount) : 0;
-  results.hidden = false;
-  results.innerHTML =
-    `<h2>Resultat</h2>
-     <p><strong>Total score:</strong> ${score}</p>
-     <p><strong>Genomsnittlig reaktionstid:</strong> ${avg.toFixed(0)} ms</p>
-     <button id="again">Spela igen</button>`;
-
-  document.getElementById("again").addEventListener("click", resetToStart);
-}
-
-function resetToStart() {
-  running = false;
-
-  // rensa siffror
-  score = 0;
-  reactionSum = 0;
-  reactionCount = 0;
-
-  scoreEl.textContent = "0";
-  avgEl.textContent = "-";
-  timeLeftEl.textContent = "0.0";
-
-  // UI tillbaka som start
-  results.hidden = true;
-  results.textContent = "";
-
-  countdownEl.hidden = true;
-
-  playArea.hidden = true;
-  hud.hidden = true;
-  menu.hidden = false;
-
-  target.style.display = "none";
-}
-
-  document.getElementById("again").addEventListener("click", resetToStart);
-
-  function resetToStart() {
-  running = false;
-
-  // rensa siffror
-  score = 0;
-  reactionSum = 0;
-  reactionCount = 0;
-
-  scoreEl.textContent = "0";
-  avgEl.textContent = "-";
-  timeLeftEl.textContent = "0.0";
-
-  // UI tillbaka som start
-  results.hidden = true;
-  results.textContent = "";
-
-  countdownEl.hidden = true;
-
-  playArea.hidden = true;
-  hud.hidden = true;
-  menu.hidden = false;
-
-  target.style.display = "none";
-}
-
-  function loop() {
-    if (!running) return;
-
-    const now = performance.now();
-    const leftMs = Math.max(0, endTime - now);
-    timeLeftEl.textContent = (leftMs / 1000).toFixed(1);
-
-    if (leftMs <= 0) {
-      stopGame();
-      return;
+      // Byt “skin” (symbol)
+      const skins = ["★", "✦", "✶", "✹", "✸"];
+      target.textContent = skins[level - 1] || "★";
     }
 
-    requestAnimationFrame(loop);
-  }
+    function medalForScore(s) {
+      // Medalj baserat på score (du kan justera!)
+      if (s >= 35) return { name: "Guld 🥇", note: "Du är snabb!" };
+      if (s >= 25) return { name: "Silver 🥈", note: "Stabilt!" };
+      if (s >= 15) return { name: "Brons 🥉", note: "Bra start!" };
+      return { name: "Ingen medalj ännu", note: "Fortsätt träna!" };
+    }
 
-  function updateHud() {
-    scoreEl.textContent = score;
-    if (reactionCount === 0) {
+    // -----------------------------
+    // Start / nedräkning
+    // -----------------------------
+    function startGame(seconds) {
+      durationMs = seconds * 1000;
+
+      // reset
+      score = 0;
+      reactionSum = 0;
+      reactionCount = 0;
+      running = false;
+
+      scoreEl.textContent = "0";
       avgEl.textContent = "-";
-    } else {
-      const avg = reactionSum / reactionCount;
-      avgEl.textContent = avg.toFixed(0);
+      levelEl.textContent = "1";
+      timeLeftEl.textContent = seconds.toFixed(1);
+
+      // UI
+      results.hidden = true;
+      results.textContent = "";
+
+      menu.hidden = true;
+      hud.hidden = false;
+      playArea.hidden = false;
+
+      target.style.display = "none";
+      countdownEl.hidden = false;
+      countdownEl.textContent = "3";
+
+      applyLevelStyle(1);
+      startCountdownThenRun(3);
     }
-  }
 
-  function placeTargetRandom() {
-    // visa ifall den var dold efter stop
-    target.style.display = "grid";
+    function startCountdownThenRun(fromNumber) {
+      let n = fromNumber;
+      countdownEl.textContent = n;
 
-    const areaRect = playArea.getBoundingClientRect();
-    const size = 56; // samma som CSS width/height
+      const tick = () => {
+        n--;
+        if (n <= 0) {
+          countdownEl.textContent = "GO!";
+          setTimeout(() => {
+            countdownEl.hidden = true;
+            beginRunning();
+          }, 250);
+          return;
+        }
+        countdownEl.textContent = n;
+        setTimeout(tick, 700);
+      };
 
-    // lite marginal så den inte klipps av kanterna
-    const margin = 6;
+      setTimeout(tick, 700);
+    }
 
-    const maxX = Math.max(margin, areaRect.width - size - margin);
-    const maxY = Math.max(margin, areaRect.height - size - margin);
+    function beginRunning() {
+      endTime = performance.now() + durationMs;
+      running = true;
+      placeTargetRandom();
+      loop();
+    }
 
-    const x = rand(margin, maxX);
-    const y = rand(margin, maxY);
+    // -----------------------------
+    // Loop / HUD
+    // -----------------------------
+    function loop() {
+      if (!running) return;
 
-    target.style.left = `${x}px`;
-    target.style.top = `${y}px`;
+      const now = performance.now();
+      const leftMs = Math.max(0, endTime - now);
+      timeLeftEl.textContent = (leftMs / 1000).toFixed(1);
 
-    targetShownAt = performance.now();
-  }
+      if (leftMs <= 0) {
+        stopGame();
+        return;
+      }
+      requestAnimationFrame(loop);
+    }
 
-  function rand(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-</script>
+    function updateHud() {
+      scoreEl.textContent = score;
 
+      if (reactionCount === 0) {
+        avgEl.textContent = "-";
+      } else {
+        const avg = reactionSum / reactionCount;
+        avgEl.textContent = avg.toFixed(0);
+      }
+
+      const lvl = getLevelFromScore(score);
+      levelEl.textContent = String(lvl);
+      applyLevelStyle(lvl);
+    }
+
+    // -----------------------------
+    // Placera mål slumpmässigt
+    // -----------------------------
+    function placeTargetRandom() {
+      // visa ifall den var dold
+      target.style.display = "grid";
+
+      // “pop” animation
+      target.classList.remove("pop");
+      void target.offsetWidth;
+      target.classList.add("pop");
+
+      const areaRect = playArea.getBoundingClientRect();
+
+      // Läs faktisk storlek (för att nivåer ändrar storlek)
+      const size = target.getBoundingClientRect().width;
+      const margin = 6;
+
+      const maxX = Math.max(margin, areaRect.width - size - margin);
+      const maxY = Math.max(margin, areaRect.height - size - margin);
+
+      const x = rand(margin, maxX);
+      const y = rand(margin, maxY);
+
+      target.style.left = `${x}px`;
+      target.style.top = `${y}px`;
+
+      targetShownAt = performance.now();
+    }
+
+    function rand(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // -----------------------------
+    // Jämförelse idag (lokalt)
+    // -----------------------------
+    function todaysAttempts() {
+      const key = todayKey();
+      return stats.attempts.filter(a => a.day === key && typeof a.score === "number");
+    }
+
+    function percentileRankHigherIsBetter(value, values) {
+      // 0..100 där högre = bättre
+      if (values.length === 0) return null;
+      const sorted = [...values].sort((a,b)=>a-b);
+      let countBelow = 0;
+      for (const v of sorted) if (v < value) countBelow++;
+      return (countBelow / sorted.length) * 100;
+    }
+
+    function overallAvgMsFromAttempts() {
+      // snitt av "avgMs" från varje runda som har avgMs
+      const list = stats.attempts.filter(a => typeof a.avgMs === "number");
+      if (list.length === 0) return null;
+      const sum = list.reduce((acc, a) => acc + a.avgMs, 0);
+      return sum / list.length;
+    }
+
+    // -----------------------------
+    // Stop / resultat / spara
+    // -----------------------------
+    function stopGame() {
+      running = false;
+      target.style.display = "none";
+
+      const avg = reactionCount ? (reactionSum / reactionCount) : 0;
+      const avgMs = reactionCount ? (reactionSum / reactionCount) : null;
+
+      // Uppdatera rekord
+      if (score > stats.bestScore) stats.bestScore = score;
+      if (avgMs !== null) {
+        if (stats.bestAvgMs === null || avgMs < stats.bestAvgMs) stats.bestAvgMs = avgMs;
+      }
+
+      // Spara försök
+      stats.attempts.push({
+        day: todayKey(),
+        score: score,
+        avgMs: avgMs,
+        t: Date.now()
+      });
+
+      // håll listan liten
+      if (stats.attempts.length > 200) stats.attempts = stats.attempts.slice(-200);
+
+      saveStats(stats);
+
+      // Jämförelse idag (baserat på dina rundor idag på samma enhet)
+      const todays = todaysAttempts();
+      const scoresToday = todays.map(a => a.score);
+      const p = percentileRankHigherIsBetter(score, scoresToday);
+
+      let compareText = "";
+      if (p !== null) {
+        const topPct = Math.max(1, Math.round(100 - p));
+        compareText = `<p><strong>Jämförelse idag:</strong> Du är bland de <strong>${topPct}%</strong> bästa (på den här enheten idag).</p>`;
+      }
+
+      // Personligt snitt (över alla rundor på enheten)
+      const overallAvg = overallAvgMsFromAttempts();
+      const overallText = (overallAvg === null) ? "-" : `${overallAvg.toFixed(0)} ms`;
+
+      // Medalj
+      const medal = medalForScore(score);
+      const medalText = `<p><strong>Medalj:</strong> ${medal.name} — <span class="muted">${medal.note}</span></p>`;
+
+      const bestAvgText = (stats.bestAvgMs === null) ? "-" : `${stats.bestAvgMs.toFixed(0)} ms`;
+
+      results.hidden = false;
+      results.innerHTML =
+        `<h2>Resultat</h2>
+         <p><strong>Total score:</strong> ${score}</p>
+         ${medalText}
+         <p><strong>Genomsnittlig reaktionstid:</strong> ${avg.toFixed(0)} ms</p>
+         ${compareText}
+         <hr style="border:0;border-top:1px solid rgba(255,255,255,0.15);margin:10px 0;">
+         <p><strong>Personligt rekord (score):</strong> ${stats.bestScore}</p>
+         <p><strong>Bästa snittreaktion:</strong> ${bestAvgText}</p>
+         <p><strong>Ditt snitt (alla rundor):</strong> ${overallText}</p>
+         <button id="again">Spela igen</button>`;
+
+      document.getElementById("again").addEventListener("click", resetToStart);
+    }
+
+    function resetToStart() {
+      running = false;
+
+      // reset siffror
+      score = 0;
+      reactionSum = 0;
+      reactionCount = 0;
+
+      scoreEl.textContent = "0";
+      avgEl.textContent = "-";
+      timeLeftEl.textContent = "0.0";
+      levelEl.textContent = "1";
+
+      // UI som första gången
+      results.hidden = true;
+      results.textContent = "";
+      countdownEl.hidden = true;
+
+      playArea.hidden = true;
+      hud.hidden = true;
+      menu.hidden = false;
+
+      target.style.display = "none";
+      applyLevelStyle(1);
+    }
+  </script>
 </body>
 </html>
-
-
-
-
-
