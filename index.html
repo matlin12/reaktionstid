@@ -24,12 +24,17 @@
       min-height: 100vh;
     }
 
-    h1{
-      margin: 0 0 12px;
-      font-size: 28px;
-      letter-spacing: 0.2px;
-      text-align: center;
-}
+  h1 {
+    text-align: center; 
+    margin: 0 auto 12px;
+    letter-spacing: 0.6px;
+
+    /* Glow-effekt */
+    text-shadow:
+      0 0 6px rgba(255, 213, 74, 0.6),
+      0 0 16px rgba(255, 213, 74, 0.35),
+      0 0 32px rgba(255, 213, 74, 0.18);
+  }
 
     }
 
@@ -445,14 +450,19 @@
       return stats.attempts.filter(a => a.day === key && typeof a.score === "number");
     }
 
-    function percentileRankHigherIsBetter(value, values) {
-      // 0..100 där högre = bättre
-      if (values.length === 0) return null;
-      const sorted = [...values].sort((a,b)=>a-b);
-      let countBelow = 0;
-      for (const v of sorted) if (v < value) countBelow++;
-      return (countBelow / sorted.length) * 100;
-    }
+  function topPercentHigherIsBetter(value, values) {
+    // Returnerar ett tal 1..100 där LÄGRE är bättre (t.ex. 20 = topp 20%)
+    // “Bland de topp X%” betyder: andelen som är >= din score.
+    if (values.length === 0) return null;
+
+    let countAtLeast = 0;
+    for (const v of values) {
+      if (v >= value) countAtLeast++;
+  }
+
+  const top = (countAtLeast / values.length) * 100;
+  return Math.max(1, Math.round(top));
+}
 
     function overallAvgMsFromAttempts() {
       // snitt av "avgMs" från varje runda som har avgMs
@@ -556,6 +566,7 @@
   </script>
 </body>
 </html>
+
 
 
 
